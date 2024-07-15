@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 
 const Card = ({room}) => {
-    console.log(room)
+    // console.log(room)
     return (
       <Link
         to={""}
