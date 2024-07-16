@@ -1,25 +1,28 @@
 import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import queryString from "query-string";
+import qs from "query-string"
 
 const CategoryBox = ({ label, Icon, description,active }) => {
     const [params, setParams] = useSearchParams();
-    const category = params.get("category");
-     console.log(active)
+     
+    
     const navigate = useNavigate();
     const handleClick = () => {
       
-      let currentQuery = { category: label };
-      // console.log(currentQuery);
+      let currentQuery = {};
+      if(params){
+        currentQuery=qs.parse(params.toString());
+      }
+      const updateQury={...currentQuery,category:label}
+      
       const url = queryString.stringifyUrl({
         url: "/",
-        query: currentQuery,
+        query: updateQury,
       });
-      // url output---> /?category=label
-
-      // 2. Set query string in url
       navigate(url);
     };
+    params.get("category");
   
   return (
     <div
