@@ -5,7 +5,7 @@ export  const saveUser=async user=>{
     const Axios=useAxios();
     const createUser={
         email:user?.email,
-        role:"admin",
+        role:"guest",
         status:"verified"
     }
     const {data} = await Axios.put(`/users/${user?.email}`,createUser);
