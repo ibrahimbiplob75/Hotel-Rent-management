@@ -34,6 +34,8 @@ const verifyToken = async (req, res, next) => {
   })
 }
 
+
+
 const client = new MongoClient(process.env.DB_URI, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -43,11 +45,15 @@ const client = new MongoClient(process.env.DB_URI, {
 })
 async function run() {
   try {
+
+
+    await client.connect();
+    const usersCollection=client.db("stay-vista").collection("users")
     // auth related api
     app.post('/jwt', async (req, res) => {
       const user = req.body
       console.log('I need a new jwt', user)
-      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+      const token = jwt.sign(user, process.env.SECRET_TOKEN, {
         expiresIn: '365d',
       })
       res
