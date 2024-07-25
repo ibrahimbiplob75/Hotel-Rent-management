@@ -1,11 +1,7 @@
 
 import { DateRange } from "react-date-range";
-const Calender = () => {
-    return (
-        <DateRange>
-            
-        </DateRange>
-    );
+const Calender = ({dateRange}) => {
+    return <DateRange ranges={dateRange}></DateRange>;
 };
 
 export default Calender;

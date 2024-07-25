@@ -3,6 +3,7 @@ import Card from "./Card";
 import Container from "../Shared/Container";
 import { useSearchParams } from "react-router-dom";
 import Empty from "../Shared/EmptyMessage/Empty";
+import { GetRooms } from "../../api/room";
 
 
 
@@ -14,7 +15,7 @@ const Rooms = () => {
     // console.log(category)
     // console.log("cat",category)
     useEffect(()=>{
-        fetch("../../../public/rooms.json").then(res=>res.json()).then(data=>{
+        GetRooms().then(data=>{
           if(category){
            const filter= data.filter(room=>room.category===category);
            setRooms(filter);
