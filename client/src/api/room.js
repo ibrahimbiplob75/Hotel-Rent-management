@@ -13,6 +13,11 @@ export const GetRoom=async id=>{
     return data; 
 }
 
+export const hostRoom=async email=>{
+    const {data}=await Axios.get(`/rooms/${email}`);
+    return data; 
+}
+
 export const addRoom=async roomData=>{
     const {data}=await Axios.post("/room",roomData);
     return data;

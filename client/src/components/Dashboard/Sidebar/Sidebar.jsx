@@ -1,28 +1,25 @@
 import { useState } from "react";
 import { GrLogout } from "react-icons/gr";
 import { FcSettings } from "react-icons/fc";
-import { BsFingerprint, BsFillHouseAddFill } from "react-icons/bs";
 import { GrUserAdmin } from "react-icons/gr";
-import { MdHomeWork } from "react-icons/md";
 import { AiOutlineBars } from "react-icons/ai";
 import { BsGraphUp } from "react-icons/bs";
-
 import { Link } from "react-router-dom";
-// import useRole from "../../../hooks/useRole";
 import MenuItem from "./Menu/MenuItem";
-// import HostMenu from "./Menu/HostMenu";
-// import AdminMenu from "./Menu/AdminMenu";
-// import GuestMenu from "./Menu/GuestMenu";
+import GuestMenu from "./Menu/GuestMenu";
 import ToggleBtn from "../../Shared/Button/ToggleBtn";
 import useAuth from "../../../hooks/useAuth";
+import useRole from "../../../hooks/useRole";
+import AdminMenu from "./Menu/AdminMenu";
+import HostMenu from "./Menu/HostMenu";
 
 const Sidebar = () => {
-  const { logOut } = useAuth;
+  const { logOut } = useAuth();
   const [isActive, setActive] = useState(false);
   const [toggle, setToggle] = useState(true);
-//   const [role, isLoading] = useRole();
-//   console.log(role, isLoading);
-const role = "host";
+  const [role, isLoading] = useRole();
+  console.log(role, isLoading);
+
   // Sidebar Responsive Handler
   const handleToggle = () => {
     setActive(!isActive);
@@ -87,33 +84,22 @@ const role = "host";
 
             {/*  Menu Items */}
             <nav>
-              {/* Statistics */}
+              
+
               <MenuItem
                 label="Statistics"
                 address="/dashboard"
                 icon={BsGraphUp}
               />
-
-              {/* add room */}
-              <MenuItem
-                label="add room"
-                address="/dashboard/add_room"
-                icon={BsFillHouseAddFill}
-              />
-
-              {/* my listing */}
-              <MenuItem
-                label="my listing"
-                address="/dashboard/my-listing"
-                icon={MdHomeWork}
-              />
-
-              {/* manage booking */}
-              <MenuItem
-                label="manage booking"
-                address="/dashboard/manage-booking"
-                icon={GrUserAdmin}
-              />
+              {role === "guest" && <GuestMenu />}
+              {role === "host" ? (
+                toggle ? (
+                  <HostMenu />
+                ) : (
+                  <GuestMenu />
+                )
+              ) : undefined}
+              {role === "admin" && <AdminMenu/>}
             </nav>
           </div>
         </div>
@@ -132,7 +118,7 @@ const role = "host";
             onClick={logOut}
             className="flex w-full items-center px-4 py-2 mt-5 text-gray-600 hover:bg-gray-300   hover:text-gray-700 transition-colors duration-300 transform"
           >
-            <GrLogout className="w-5 h-5" />
+            <GrLogout onClick={logOut} className="w-5 h-5" />
 
             <span className="mx-4 font-medium">Logout</span>
           </button>

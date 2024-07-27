@@ -101,6 +101,13 @@ async function run() {
       res.send(result)
     });
 
+    app.get("/users/:email",async(req,res)=>{
+      const email=req.params.email;
+      const query={email:email}
+      const result=await usersCollection.findOne(query);
+      res.send(result)
+    });
+
     //rooms data
     app.get("/room",async(req,res)=>{
       const result=await roomsCollection.find().toArray();
@@ -112,6 +119,13 @@ async function run() {
       console.log(id);
       const query={_id:new ObjectId(id)}
       const result=await roomsCollection.findOne(query);
+      res.send(result)
+    });
+    //email based data
+    app.get("/rooms/:email",async(req,res)=>{
+      const email=req.params.email;
+      const query={'host.email':email}
+      const result=await roomsCollection.find(query).toArray();
       res.send(result)
     });
 
