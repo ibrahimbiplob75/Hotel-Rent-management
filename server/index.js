@@ -113,7 +113,13 @@ async function run() {
       const query={_id:new ObjectId(id)}
       const result=await roomsCollection.findOne(query);
       res.send(result)
-    })
+    });
+
+     app.post("/room",async(req,res)=>{
+      const data=req.body;
+      const result=await roomsCollection.insertOne(data);
+      res.send(result)
+    });
 
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })

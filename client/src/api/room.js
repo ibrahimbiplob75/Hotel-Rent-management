@@ -1,8 +1,9 @@
-import useAxios from "../hooks/useAxios"
 
+import useAxios from "../hooks/useAxios"
 const Axios=useAxios();
 
 export const GetRooms=async()=>{
+    
     const {data}=await Axios.get("/room");
     return data;
     
@@ -10,4 +11,10 @@ export const GetRooms=async()=>{
 export const GetRoom=async id=>{
     const {data}=await Axios.get(`/room/${id}`);
     return data; 
+}
+
+export const addRoom=async roomData=>{
+    const {data}=await Axios.post("/room",roomData);
+    return data;
+
 }

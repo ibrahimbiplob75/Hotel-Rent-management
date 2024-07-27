@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Calender from '../../Shared/Calender';
-import Button from '../../Button/Button';
+import Button from '../../Shared/Button/Button';
 
 const RoomReservation = ({room}) => {
 

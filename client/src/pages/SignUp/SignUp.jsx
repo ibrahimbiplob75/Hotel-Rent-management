@@ -20,7 +20,7 @@ const SignUp = () => {
     const email = form.email.value;
     const password = form.password.value;
     const image = form.image.files[0];
-    const imageData = await imageUpload(image);
+    // const imageData = await imageUpload(image);
 
 
     try{
