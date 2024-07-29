@@ -102,9 +102,25 @@ async function run() {
       });
       res.send({clientSecret: paymentIntent.client_secret});
     })
+
+
   app.post("/bookings",async(req,res)=>{
     const data=req.body;
     const result=await bookingsCollection.insertOne(data);
+    res.send(result);
+  })
+
+  app.get("/bookings/:email",async(req,res)=>{
+    const email=req.params.email;
+    const query={"guest.email":email}
+    const result=await bookingsCollection.find(query).toArray();
+    res.send(result);
+  })
+
+  app.get("/bookings/host/:email",async(req,res)=>{
+    const email=req.params.email;
+    const query={host:email}
+    const result=await bookingsCollection.find(query).toArray();
     res.send(result);
   })
 
@@ -119,7 +135,7 @@ async function run() {
         booking:status
       },
     };
-    const result = await bookingsCollection.updateOne(query, updateDoc, options);
+    const result = await roomsCollection.updateOne(query, updateDoc, options);
     res.send(result);
   })
 

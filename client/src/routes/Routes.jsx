@@ -12,6 +12,7 @@ import AddRoom from '../pages/Dashboard/Host/AddRoom'
 import MyListings from '../pages/Dashboard/Host/MyListing'
 import HostRoute from '../PrivateRoute/HostRoute'
 import Profile from '../pages/Dashboard/Common/Profile'
+import MyBookings from '../pages/Dashboard/Guest/MyBookings'
 
 export const router = createBrowserRouter([
   {
@@ -59,7 +60,15 @@ export const router = createBrowserRouter([
         path: "my-profile",
         element: (
           <PrivateRoute>
-              <Profile></Profile>
+            <Profile></Profile>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "my-bookings",
+        element: (
+          <PrivateRoute>
+            <MyBookings></MyBookings>
           </PrivateRoute>
         ),
       },

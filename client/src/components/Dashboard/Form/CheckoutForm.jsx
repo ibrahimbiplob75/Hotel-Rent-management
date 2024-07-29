@@ -3,12 +3,16 @@ import "./CheckoutForm.css";
 import { ImSpinner9 } from "react-icons/im";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { getClientSecret } from "../../../api/Booking";
+import { getClientSecret, saveBookingInfo, updateBooked } from "../../../api/Booking";
+import useAuth from "../../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const CheckoutForm = ({ closeModal, bookingInfo, refetch }) => {
   const stripe = useStripe();
   const elements = useElements();
-
+  const {user}=useAuth();
+   const navigate = useNavigate();
    const [clientSecret, setClientSecret] = useState();
    const [cardError, setCardError] = useState("");
    const [processing, setProcessing] = useState(false);
@@ -16,7 +20,7 @@ const CheckoutForm = ({ closeModal, bookingInfo, refetch }) => {
   useEffect(() => {
     if (bookingInfo.totalPrice > 0) {
       getClientSecret({ price: bookingInfo?.totalPrice }).then((data) =>
-        setClientSecret(data)
+        setClientSecret(data.clientSecret)
       );
     }
   }, [bookingInfo?.totalPrice]);
@@ -50,7 +54,50 @@ const CheckoutForm = ({ closeModal, bookingInfo, refetch }) => {
       console.log('[PaymentMethod]', paymentMethod)
       setCardError('')
     }
+
+    const { error: confirmError, paymentIntent } =
+       await stripe.confirmCardPayment(clientSecret, {
+         payment_method: {
+           card: card,
+           billing_details: {
+             email: user?.email,
+             name: user?.displayName,
+           },
+         },
+       });
+
+     if (confirmError) {
+       console.log(confirmError);
+       setCardError(confirmError.message);
+       setProcessing(false);
+       return;
+     }
+     
+     if(paymentIntent.status==="succeeded"){
+      const paymentInfo = {
+        ...bookingInfo,
+        roomId: bookingInfo.room_id,
+        transactionId: paymentIntent.id,
+        date: new Date(),
+      };
+
+      try {
+        // 2. save payment info in booking collection (db)
+        const booking = saveBookingInfo(paymentInfo);
+        // 3. change room status to booked in db
+        const updateRoomBook = updateBooked(bookingInfo?.room_id, true);
+
+        // update ui
+        refetch();
+        closeModal();
+        toast.success("Room Booked Successfully");
+        navigate("/dashboard/my-bookings");
+      } catch (err) {
+        console.log(err);
+      }
+     }
   }
+  
 
   return (
     <>

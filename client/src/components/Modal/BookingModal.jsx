@@ -15,7 +15,7 @@ import { loadStripe } from "@stripe/stripe-js";
 const stripePromise = loadStripe(import.meta.env.VITE_Payment_Key);
 
 
-const BookingModal = ({ closeModal, isOpen, bookingInfo }) => {
+const BookingModal = ({ closeModal, isOpen, bookingInfo,refetch }) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
@@ -86,6 +86,7 @@ const BookingModal = ({ closeModal, isOpen, bookingInfo }) => {
                   <CheckoutForm
                     closeModal={closeModal}
                     bookingInfo={bookingInfo}
+                    refetch={refetch}
                   ></CheckoutForm>
                 </Elements>
               </DialogPanel>

@@ -1,16 +1,34 @@
 
 import Container from "../Shared/Container";
-import { useLoaderData } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Heading from "./SingleRoom/Heading";
 import RoomInfo from "./SingleRoom/RoomInfo";
 import RoomReservation from "./SingleRoom/RoomReservation";
+import useAxios from "../../hooks/useAxios";
+import { useQuery } from "@tanstack/react-query";
+import Loader from "../Shared/Loader";
 
 
 
 const RoomDetails = () => {
     
-    const room=useLoaderData();
+    const { id } = useParams();
+    const axiosCommon = useAxios();
+
+    const {
+      data: room = {},
+      isLoading,
+      refetch,
+    } = useQuery({
+      queryKey: ["room", id],
+      queryFn: async () => {
+        const { data } = await axiosCommon.get(`/room/${id}`);
+        return data;
+      },
+    });
+
+    if (isLoading) return <Loader />;
     return (
       <Container>
         <Helmet>
@@ -33,11 +51,11 @@ const RoomDetails = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-7 md:gap-10 mt-6">
               {/* Room Info */}
-             <RoomInfo room={room}></RoomInfo>
+              <RoomInfo room={room}></RoomInfo>
 
               <div className="md:col-span-3 order-first md:order-last mb-10">
                 {/* RoomReservation calender*/}
-                <RoomReservation room={room} />
+                <RoomReservation refetch={refetch} room={room} />
               </div>
             </div>
           </div>
