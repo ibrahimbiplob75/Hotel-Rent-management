@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const port = process.env.PORT || 8000
 
 // middleware
@@ -20,7 +21,6 @@ app.use(cookieParser())
 app.use(morgan('dev'))
 const verifyToken = async (req, res, next) => {
   const token = req.cookies?.token
-  console.log(token)
   if (!token) {
     return res.status(401).send({ message: 'unauthorized access' })
   }
@@ -50,10 +50,12 @@ async function run() {
     await client.connect();
     const usersCollection=client.db("stay-vista").collection("users");
     const roomsCollection=client.db("stay-vista").collection("rooms");
+    const bookingsCollection=client.db("stay-vista").collection("bookings");
+
+
     // auth related api
     app.post('/jwt', async (req, res) => {
       const user = req.body
-      console.log('I need a new jwt', user)
       const token = jwt.sign(user, process.env.SECRET_TOKEN, {
         expiresIn: '365d',
       })
@@ -81,6 +83,45 @@ async function run() {
         res.status(500).send(err)
       }
     })
+
+    // stripe payment
+    app.post("/create-payment-intent",async(req,res)=>{
+      const {price}=req.body;
+      
+      const amount=parseInt(price * 100);
+      console.log(amount)
+      if(!price && amount<1){
+        return
+      }
+      const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: "usd",
+      automatic_payment_methods: {
+        enabled: true,
+      }
+      });
+      res.send({clientSecret: paymentIntent.client_secret});
+    })
+  app.post("/bookings",async(req,res)=>{
+    const data=req.body;
+    const result=await bookingsCollection.insertOne(data);
+    res.send(result);
+  })
+
+  app.patch("/bookings/status/:id",async(req,res)=>{
+    const id=req.params.id;
+    const status=req.body.status;
+    const query={_id : new ObjectId(id)}
+    const options = { upsert: true };
+
+    const updateDoc = {
+      $set: {
+        booking:status
+      },
+    };
+    const result = await bookingsCollection.updateOne(query, updateDoc, options);
+    res.send(result);
+  })
 
     // Save or modify user email, status in DB
     app.put('/users/:email', async (req, res) => {
@@ -116,7 +157,6 @@ async function run() {
     //single room data based on Id
     app.get("/room/:id",async(req,res)=>{
       const id=req.params.id;
-      console.log(id);
       const query={_id:new ObjectId(id)}
       const result=await roomsCollection.findOne(query);
       res.send(result)
@@ -129,7 +169,7 @@ async function run() {
       res.send(result)
     });
 
-     app.post("/room",async(req,res)=>{
+    app.post("/room",async(req,res)=>{
       const data=req.body;
       const result=await roomsCollection.insertOne(data);
       res.send(result)

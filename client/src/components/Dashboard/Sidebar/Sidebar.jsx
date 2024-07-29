@@ -84,8 +84,6 @@ const Sidebar = () => {
 
             {/*  Menu Items */}
             <nav>
-              
-
               <MenuItem
                 label="Statistics"
                 address="/dashboard"
@@ -99,7 +97,7 @@ const Sidebar = () => {
                   <GuestMenu />
                 )
               ) : undefined}
-              {role === "admin" && <AdminMenu/>}
+              {role === "admin" && <AdminMenu />}
             </nav>
           </div>
         </div>
@@ -109,8 +107,8 @@ const Sidebar = () => {
 
           {/* Profile Menu */}
           <MenuItem
-            label="Profile"
-            address="/dashboard/profile"
+            label="profile"
+            address="/dashboard/my-profile"
             icon={FcSettings}
           />
 
