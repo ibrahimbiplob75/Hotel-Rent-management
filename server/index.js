@@ -102,7 +102,24 @@ async function run() {
       });
       res.send({clientSecret: paymentIntent.client_secret});
     })
+  // all useers data
+  app.get("/users",async(req,res)=>{
+    const result=await usersCollection.find().toArray();
+    res.send(result)
+  })
+  //role update of users
+  app.put("/users/update/:email",async(req,res)=>{
+    const email=req.params.email;
+    const user=req.body;
+    const query={email:email};
+    const options = { upsert: true };
+    const updateDoc = {
+      $set: { ...user, timestamp: Date.now() },
+    };
+    const result = await usersCollection.updateOne(query, updateDoc, options);
+    res.send(result);
 
+  })
 
   app.post("/bookings",async(req,res)=>{
     const data=req.body;

@@ -1,14 +1,29 @@
 import useAxios from "../hooks/useAxios";
-    const Axios=useAxios();
+const Axios=useAxios();
+
 export  const saveUser=async user=>{
-    // console.log(user?.email)
-    const Axios=useAxios();
+    
     const createUser={
         email:user?.email,
         role:"guest",
         status:"verified"
     }
     const {data} = await Axios.put(`/users/${user?.email}`,createUser);
+    return data;
+}
+
+export const allUsers=async ()=>{
+    const {data}=await Axios.get("/users");
+    return data;
+}
+
+export const userRole=async ({email,role})=>{
+    const updateUser={
+        email,
+        role,
+        status:"verified"
+    }
+    const {data} = await Axios.put(`/users/update/${email}`,updateUser);
     return data;
 }
 

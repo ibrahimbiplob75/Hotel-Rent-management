@@ -58,7 +58,10 @@ const RoomReservation = ({room,refetch}) => {
           <Calender dateRange={dateRange}></Calender>
         </div>
         <div onClick={() => setIsOpen(true)}>
-          <Button label={"Reservation"}></Button>
+          <Button
+            disabled={room?.booking}
+            label={room?.booking ? "Booked" : "Reservation"}
+          ></Button>
         </div>
         <hr />
         <div className="p-4 flex items-center justify-between font-semibold text-lg">

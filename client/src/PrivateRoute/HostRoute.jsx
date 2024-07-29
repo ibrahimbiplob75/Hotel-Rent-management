@@ -3,7 +3,7 @@ import Loader from "../components/Shared/Loader";
 import useRole from "../hooks/useRole";
 
 
-const HostRoute = () => {
+const HostRoute = ({children}) => {
     
     const [role, isLoading] = useRole();
     if (isLoading) {
