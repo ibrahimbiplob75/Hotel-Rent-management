@@ -14,7 +14,7 @@ import {
 import { app } from '../firebase/firebase.config'
 import { TokenRemove } from '../api/Auth'
 
-export const AuthContext = createContext(null)
+export const AuthContext = createContext(null);
 const auth = getAuth(app)
 const googleProvider = new GoogleAuthProvider()
 

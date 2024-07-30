@@ -39,7 +39,7 @@ export  const roledUser=async user=>{
 }
 
 export const Tokengen=async email=>{
-    const token = await Axios.post("/jwt",email);
+    const token = await Axios.post("/jwt",{email});
     return token;
 }
 

@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
+const nodemailer = require("nodemailer");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const port = process.env.PORT || 8000
 
@@ -19,18 +20,61 @@ app.use(cors(corsOptions))
 app.use(express.json())
 app.use(cookieParser())
 app.use(morgan('dev'))
+
+//token verified
 const verifyToken = async (req, res, next) => {
-  const token = req.cookies?.token
+  const token = req.cookies?.token;
+
   if (!token) {
-    return res.status(401).send({ message: 'unauthorized access' })
+    console.log('No token found in cookies');
+    return res.status(401).send({ message: 'Unauthorized access: No token provided' });
   }
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+
+  jwt.verify(token, process.env.SECRET_TOKEN, (err, decoded) => {
     if (err) {
-      console.log(err)
-      return res.status(401).send({ message: 'unauthorized access' })
+      console.log('Token verification failed:', err.message);
+      return res.status(401).send({ message: 'Unauthorized access: Invalid token' });
     }
-    req.user = decoded
-    next()
+
+    req.user = decoded;
+    next();
+  });
+}
+//sending email confi
+const sendEmail = (emailAddress, emailData) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // Use `true` for port 465, `false` for all other ports
+    auth: {
+      user: process.env.TRANSPORTER_EMAIL,
+      pass: process.env.TRANSPORTER_PASS,
+    },
+  })
+
+  // verify transporter
+  // verify connection configuration
+  transporter.verify(function (error, success) {
+    if (error) {
+      console.log(error)
+    } else {
+      console.log('Server is ready to take our messages',success)
+    }
+  })
+  const mailBody = {
+    from: `"StayVista" <${process.env.TRANSPORTER_EMAIL}>`, // sender address
+    to: emailAddress, // list of receivers
+    subject: emailData.subject, // Subject line
+    html: emailData.message, // html body
+  }
+
+  transporter.sendMail(mailBody, (error, info) => {
+    if (error) {
+      console.log(error)
+    } else {
+      console.log('Email Sent: ' + info.response)
+    }
   })
 }
 
@@ -52,6 +96,24 @@ async function run() {
     const roomsCollection=client.db("stay-vista").collection("rooms");
     const bookingsCollection=client.db("stay-vista").collection("bookings");
 
+//admin verify
+    const verifyAdmin = async (req, res, next) => {
+      const User = req.user
+      const query = { email: User?.email }
+      const result = await usersCollection.findOne(query)
+      if (!result || result?.role !== 'admin')
+        return res.status(401).send({ message: 'unauthorized access!!' })
+      next()
+    }
+//Host verify
+    const verifyHost = async (req, res, next) => {
+      const User = req.user
+      const query = { email: User?.email }
+      const result = await usersCollection.findOne(query)
+      if (!result || result?.role !== 'host')
+        return res.status(401).send({ message: 'unauthorized access!!' })
+      next()
+    }
 
     // auth related api
     app.post('/jwt', async (req, res) => {
@@ -103,12 +165,12 @@ async function run() {
       res.send({clientSecret: paymentIntent.client_secret});
     })
   // all useers data
-  app.get("/users",async(req,res)=>{
+  app.get("/users",verifyToken,verifyAdmin,async(req,res)=>{
     const result=await usersCollection.find().toArray();
     res.send(result)
   })
   //role update of users
-  app.put("/users/update/:email",async(req,res)=>{
+  app.put("/users/update/:email",verifyToken,verifyAdmin,async(req,res)=>{
     const email=req.params.email;
     const user=req.body;
     const query={email:email};
@@ -120,7 +182,9 @@ async function run() {
     res.send(result);
 
   })
-  app.put("/users/roled/:email",async(req,res)=>{
+
+  //user request for role
+  app.put("/users/roled/:email",verifyToken,async(req,res)=>{
     const email=req.params.email;
     const user=req.body;
     const query={email:email};
@@ -133,27 +197,37 @@ async function run() {
 
   })
 
-  app.post("/bookings",async(req,res)=>{
+  app.post("/bookings",verifyToken,async(req,res)=>{
     const data=req.body;
     const result=await bookingsCollection.insertOne(data);
+     // send email to guest
+      sendEmail(data?.guest?.email, {
+        subject: 'Booking Successful!',
+        message: `You've successfully booked a room through TravelBook. Transaction Id: ${data.transactionId}`,
+      })
+      // send email to host
+      sendEmail(data?.host?.email, {
+        subject: `Your room got booked! by ${data?.guest?.name}`,
+        message: `Get ready to welcome ${data.guest.name}.`,
+      })
     res.send(result);
   })
-
-  app.get("/bookings/:email",async(req,res)=>{
+// user booking data
+  app.get("/bookings/:email",verifyToken,async(req,res)=>{
     const email=req.params.email;
     const query={"guest.email":email}
     const result=await bookingsCollection.find(query).toArray();
     res.send(result);
   })
-
-  app.get("/bookings/host/:email",async(req,res)=>{
+//show own hotel booked data by host
+  app.get("/bookings/host/:email",verifyToken,verifyHost,async(req,res)=>{
     const email=req.params.email;
     const query={host:email}
     const result=await bookingsCollection.find(query).toArray();
     res.send(result);
   })
-
-  app.patch("/bookings/status/:id",async(req,res)=>{
+//updation booking status
+  app.patch("/bookings/status/:id",verifyToken,async(req,res)=>{
     const id=req.params.id;
     const status=req.body.status;
     const query={_id : new ObjectId(id)}
@@ -175,7 +249,7 @@ async function run() {
       const query = { email: email }
       const options = { upsert: true }
       const isExist = await usersCollection.findOne(query)
-      console.log('User found?----->', isExist)
+      // console.log('User found?----->', isExist)
       if (isExist) return res.send(isExist)
       const result = await usersCollection.updateOne(
         query,
@@ -207,14 +281,14 @@ async function run() {
       res.send(result)
     });
     //email based data
-    app.get("/rooms/:email",async(req,res)=>{
+    app.get("/rooms/:email",verifyToken,verifyHost,async(req,res)=>{
       const email=req.params.email;
       const query={'host.email':email}
       const result=await roomsCollection.find(query).toArray();
       res.send(result)
     });
 
-    app.post("/room",async(req,res)=>{
+    app.post("/room",verifyToken,verifyHost,async(req,res)=>{
       const data=req.body;
       const result=await roomsCollection.insertOne(data);
       res.send(result)
