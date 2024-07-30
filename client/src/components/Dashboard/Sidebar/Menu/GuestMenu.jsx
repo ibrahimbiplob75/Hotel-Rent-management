@@ -1,14 +1,15 @@
 import { BsFingerprint } from "react-icons/bs";
 import { GrUserAdmin } from "react-icons/gr";
 import { useState } from "react";
-import MenuItem from "./MenuItem";
 import toast from "react-hot-toast";
-import useAxios from "../../../../hooks/useAxios";
-import useRole from "../../../../hooks/useRole";
+import HostModal from "../../../Modal/HostRequestModal";
 import useAuth from "../../../../hooks/useAuth";
+import useRole from "../../../../hooks/useRole";
+import MenuItem from "./MenuItem";
+import { roledUser } from "../../../../api/Auth";
+
 
 const GuestMenu = () => {
-  const axiosSecure = useAxios();
   const { user } = useAuth();
   const [role] = useRole();
   // for modal
@@ -16,28 +17,23 @@ const GuestMenu = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-//   const modalHandler = async () => {
-//     console.log("I want to be a host");
-//     try {
-//       const currentUser = {
-//         email: user?.email,
-//         role: "guest",
-//         status: "Requested",
-//       };
-//       const { data } = await axiosSecure.put(`/user`, currentUser);
-//       console.log(data);
-//       if (data.modifiedCount > 0) {
-//         toast.success("Success! Please wait for admin confirmation");
-//       } else {
-//         toast.success("Please!, Wait for admin approval👊");
-//       }
-//     } catch (err) {
-//       console.log(err);
-//       toast.error(err.message);
-//     } finally {
-//       closeModal();
-//     }
-//   };
+  const modalHandler = async () => {
+    
+    try {
+      
+      const data = await roledUser(user);
+      if (data.modifiedCount > 0) {
+        toast.success("Success! Please wait for admin confirmation");
+      } else {
+        toast.success("Please!, Wait for admin approval👊");
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error(err.message);
+    } finally {
+      closeModal();
+    }
+  };
   return (
     <>
       <MenuItem
@@ -57,11 +53,11 @@ const GuestMenu = () => {
         </div>
       )}
       {/* Modal */}
-      {/* <HostModal
+      <HostModal
         isOpen={isModalOpen}
         closeModal={closeModal}
         modalHandler={modalHandler}
-      /> */}
+      />
     </>
   );
 };

@@ -1,8 +1,6 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
-
 import { useMutation } from "@tanstack/react-query";
-
 import toast from "react-hot-toast";
 import UpdateUserModal from "../../Modal/UpdateUserModal";
 import useAuth from "../../../hooks/useAuth";
@@ -34,9 +32,8 @@ const UserDataRow = ({ user, refetch }) => {
     
     try{
       const data=userRole({email:user?.email,role});
-      console.log(data)
-      refetch()
       toast.success("Role updated")
+      refetch();
     }catch(error){
       console.log(error);
       toast(error)
@@ -73,7 +70,7 @@ const UserDataRow = ({ user, refetch }) => {
         {user?.status ? (
           <p
             className={`${
-              user.status === "Verified" ? "text-green-500" : "text-yellow-500"
+              user.status === "verified" ? "text-green-500" : "text-red-600"
             } whitespace-no-wrap`}
           >
             {user.status}

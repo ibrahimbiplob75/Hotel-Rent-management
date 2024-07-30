@@ -27,6 +27,17 @@ export const userRole=async ({email,role})=>{
     return data;
 }
 
+export  const roledUser=async user=>{
+    
+    const createUser={
+        email:user?.email,
+        role:"guest",
+        status:"Requested"
+    }
+    const {data} = await Axios.put(`/users/roled/${user?.email}`,createUser);
+    return data;
+}
+
 export const Tokengen=async email=>{
     const token = await Axios.post("/jwt",email);
     return token;
