@@ -17,6 +17,8 @@ import ManageBookings from '../pages/Dashboard/Host/ManageBookings'
 import ManageUsers from '../pages/Dashboard/Admin/ManageUsers'
 import AdminMenu from '../components/Dashboard/Sidebar/Menu/AdminMenu'
 import AdminRoute from '../PrivateRoute/AdminRoute'
+import AdminStatistics from '../pages/Dashboard/Admin/AdminStatistics'
+import HostStatistics from '../pages/Dashboard/Host/HostStatistics'
 
 export const router = createBrowserRouter([
   {
@@ -104,6 +106,28 @@ export const router = createBrowserRouter([
             <AdminRoute>
               <ManageUsers></ManageUsers>
             </AdminRoute>
+          </PrivateRoute>
+        ),
+      },
+
+      {
+        path: "admin-statis",
+        element: (
+          <PrivateRoute>
+            <AdminRoute>
+              <AdminStatistics></AdminStatistics>
+            </AdminRoute>
+          </PrivateRoute>
+        ),
+      },
+
+      {
+        path: "host-statis",
+        element: (
+          <PrivateRoute>
+            <HostRoute>
+              <HostStatistics></HostStatistics>
+            </HostRoute>
           </PrivateRoute>
         ),
       },

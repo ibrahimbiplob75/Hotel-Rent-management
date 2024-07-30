@@ -59,7 +59,7 @@ const RoomReservation = ({room,refetch}) => {
         </div>
         <div onClick={() => setIsOpen(true)}>
           <Button
-            disabled={room?.booking}
+            disabled={room?.booking || room?.host.email===user.email}
             label={room?.booking ? "Booked" : "Reservation"}
           ></Button>
         </div>

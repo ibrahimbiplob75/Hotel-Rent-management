@@ -3,7 +3,6 @@ import { GrLogout } from "react-icons/gr";
 import { FcSettings } from "react-icons/fc";
 import { GrUserAdmin } from "react-icons/gr";
 import { AiOutlineBars } from "react-icons/ai";
-import { BsGraphUp } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import MenuItem from "./Menu/MenuItem";
 import GuestMenu from "./Menu/GuestMenu";
@@ -84,11 +83,7 @@ const Sidebar = () => {
 
             {/*  Menu Items */}
             <nav>
-              <MenuItem
-                label="Statistics"
-                address="/dashboard"
-                icon={BsGraphUp}
-              />
+              
               {role === "guest" && <GuestMenu />}
               {role === "host" ? (
                 toggle ? (
