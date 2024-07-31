@@ -19,6 +19,7 @@ import AdminMenu from '../components/Dashboard/Sidebar/Menu/AdminMenu'
 import AdminRoute from '../PrivateRoute/AdminRoute'
 import AdminStatistics from '../pages/Dashboard/Admin/AdminStatistics'
 import HostStatistics from '../pages/Dashboard/Host/HostStatistics'
+import GuestStatistics from '../pages/Dashboard/Guest/GuestStatistics'
 
 export const router = createBrowserRouter([
   {
@@ -128,6 +129,14 @@ export const router = createBrowserRouter([
             <HostRoute>
               <HostStatistics></HostStatistics>
             </HostRoute>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "guest-statis",
+        element: (
+          <PrivateRoute>
+              <GuestStatistics></GuestStatistics>
           </PrivateRoute>
         ),
       },

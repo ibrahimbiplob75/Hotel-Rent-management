@@ -1,4 +1,4 @@
-import { BsFingerprint } from "react-icons/bs";
+import { BsFingerprint, BsGraphUp } from "react-icons/bs";
 import { GrUserAdmin } from "react-icons/gr";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -36,6 +36,11 @@ const GuestMenu = () => {
   };
   return (
     <>
+      <MenuItem
+        label="Statistics"
+        address="/dashboard/guest-statis"
+        icon={BsGraphUp}
+      />
       <MenuItem
         icon={BsFingerprint}
         label="My Bookings"
