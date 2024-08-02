@@ -241,6 +241,13 @@ async function run() {
     const result = await roomsCollection.updateOne(query, updateDoc, options);
     res.send(result);
   })
+   // delete a booking
+    app.delete('/booking/:id', verifyToken, async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await bookingsCollection.deleteOne(query)
+      res.send(result)
+    })
 
     // Save or modify user email, status in DB
     app.put('/users/:email', async (req, res) => {
@@ -295,13 +302,7 @@ async function run() {
     });
 
 
-    // delete a booking
-    app.delete('/booking/:id', verifyToken, async (req, res) => {
-      const id = req.params.id
-      const query = { _id: new ObjectId(id) }
-      const result = await bookingsCollection.deleteOne(query)
-      res.send(result)
-    })
+   
 
     // Admin Statistics
     app.get('/admin-stat', verifyToken, verifyAdmin, async (req, res) => {
@@ -311,7 +312,7 @@ async function run() {
           {
             projection: {
               date: 1,
-              price: 1,
+              totalPrice: 1,
             },
           }
         )
@@ -320,13 +321,13 @@ async function run() {
       const totalUsers = await usersCollection.countDocuments()
       const totalRooms = await roomsCollection.countDocuments()
       const totalPrice = bookingDetails.reduce(
-        (sum, booking) => sum + booking.price,
+        (sum, booking) => sum + booking.totalPrice,
         0
       )
       const chartData = bookingDetails.map(booking => {
         const day = new Date(booking.date).getDate()
         const month = new Date(booking.date).getMonth() + 1
-        const data = [`${day}/${month}`, booking?.price]
+        const data = [`${day}/${month}`, booking?.totalPrice]
         return data
       })
       chartData.unshift(['Day', 'Sales'])
@@ -353,7 +354,7 @@ async function run() {
           {
             projection: {
               date: 1,
-              price: 1,
+              totalPrice: 1,
             },
           }
         )
@@ -363,7 +364,7 @@ async function run() {
         'host.email': email,
       })
       const totalPrice = bookingDetails.reduce(
-        (sum, booking) => sum + booking.price,
+        (sum, booking) => sum + booking.totalPrice,
         0
       )
       const { timestamp } = await usersCollection.findOne(
@@ -374,7 +375,7 @@ async function run() {
       const chartData = bookingDetails.map(booking => {
         const day = new Date(booking.date).getDate()
         const month = new Date(booking.date).getMonth() + 1
-        const data = [`${day}/${month}`, booking?.price]
+        const data = [`${day}/${month}`, booking?.totalPrice]
         return data
       })
       chartData.unshift(['Day', 'Sales'])
@@ -401,13 +402,13 @@ async function run() {
           {
             projection: {
               date: 1,
-              price: 1,
+              totalPrice: 1,
             },
           }
         ).toArray()
 
       const totalPrice = bookingDetails.reduce(
-        (sum, booking) => sum + booking.price,
+        (sum, booking) => sum + booking.totalPrice,
         0
       )
       const { timestamp } = await usersCollection.findOne(
@@ -418,7 +419,7 @@ async function run() {
       const chartData = bookingDetails.map(booking => {
         const day = new Date(booking.date).getDate()
         const month = new Date(booking.date).getMonth() + 1
-        const data = [`${day}/${month}`, booking?.price]
+        const data = [`${day}/${month}`, booking?.totalPrice]
         return data
       })
       chartData.unshift(['Day', 'Sales'])

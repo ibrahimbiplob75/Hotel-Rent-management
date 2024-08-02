@@ -61,7 +61,7 @@ const AddRoom = () => {
     try {
       console.log(Cover_image);
       const image_url = await imageUpload(Cover_image);
-      console.log(image_url);
+      // console.log(image_url);
       const roomData = {
         location,
         category,
@@ -80,7 +80,7 @@ const AddRoom = () => {
 
       //   Post request to server
       const data=await addRoom(roomData);
-      console.log("upload",data);
+      // console.log("upload",data);
       setImageText("Uploaded");
       toast.success("room added");
       navigate("/")

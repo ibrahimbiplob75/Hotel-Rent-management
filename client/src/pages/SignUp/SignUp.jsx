@@ -27,10 +27,11 @@ const SignUp = () => {
 
       //step-1 upload image
       const imageData = await imageUpload(image);
+      console.log(imageData)
       //step-2 create user in firebase
       const user=await createUser(email,password);
       //step-3 update user with image
-      await updateUserProfile(name, imageData?.data?.display_url);
+      await updateUserProfile(name, imageData);
       // step 4 insert user info in mongo
       const result=await saveUser(user?.user)
       // console.log(result);
