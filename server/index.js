@@ -164,11 +164,39 @@ async function run() {
       });
       res.send({clientSecret: paymentIntent.client_secret});
     })
+
+
+
   // all useers data
   app.get("/users",verifyToken,verifyAdmin,async(req,res)=>{
     const result=await usersCollection.find().toArray();
     res.send(result)
-  })
+  });
+  // Save or modify user email, status in DB
+  app.put('/users/:email', async (req, res) => {
+      const email = req.params.email
+      const user = req.body
+      const query = { email: email }
+      const options = { upsert: true }
+      const isExist = await usersCollection.findOne(query)
+      // console.log('User found?----->', isExist)
+      if (isExist) return res.send(isExist)
+      const result = await usersCollection.updateOne(
+        query,
+        {
+          $set: { ...user, timestamp: Date.now() },
+        },
+        options
+      )
+      res.send(result)
+  });
+  //find user by email
+  app.get("/users/:email",async(req,res)=>{
+      const email=req.params.email;
+      const query={email:email}
+      const result=await usersCollection.findOne(query);
+      res.send(result)
+  });
   //role update of users
   app.put("/users/update/:email",verifyToken,verifyAdmin,async(req,res)=>{
     const email=req.params.email;
@@ -182,7 +210,6 @@ async function run() {
     res.send(result);
 
   })
-
   //user request for role
   app.put("/users/roled/:email",verifyToken,async(req,res)=>{
     const email=req.params.email;
@@ -197,6 +224,10 @@ async function run() {
 
   })
 
+
+///Room Booking Data API
+
+  // booking of room send email to host and user
   app.post("/bookings",verifyToken,async(req,res)=>{
     const data=req.body;
     const result=await bookingsCollection.insertOne(data);
@@ -222,7 +253,8 @@ async function run() {
 //show own hotel booked data by host
   app.get("/bookings/host/:email",verifyToken,verifyHost,async(req,res)=>{
     const email=req.params.email;
-    const query={host:email}
+    const query={'host.email':email}
+    console.log(query)
     const result=await bookingsCollection.find(query).toArray();
     res.send(result);
   })
@@ -242,70 +274,43 @@ async function run() {
     res.send(result);
   })
    // delete a booking
-    app.delete('/booking/:id', verifyToken, async (req, res) => {
+  app.delete('/booking/:id', verifyToken, async (req, res) => {
       const id = req.params.id
       const query = { _id: new ObjectId(id) }
       const result = await bookingsCollection.deleteOne(query)
       res.send(result)
-    })
-
-    // Save or modify user email, status in DB
-    app.put('/users/:email', async (req, res) => {
-      const email = req.params.email
-      const user = req.body
-      const query = { email: email }
-      const options = { upsert: true }
-      const isExist = await usersCollection.findOne(query)
-      // console.log('User found?----->', isExist)
-      if (isExist) return res.send(isExist)
-      const result = await usersCollection.updateOne(
-        query,
-        {
-          $set: { ...user, timestamp: Date.now() },
-        },
-        options
-      )
-      res.send(result)
-    });
-
-    app.get("/users/:email",async(req,res)=>{
-      const email=req.params.email;
-      const query={email:email}
-      const result=await usersCollection.findOne(query);
-      res.send(result)
-    });
-
-    //rooms data
-    app.get("/room",async(req,res)=>{
+  })
+  //rooms data
+  app.get("/room",async(req,res)=>{
       const result=await roomsCollection.find().toArray();
       res.send(result)
-    });
-    //single room data based on Id
-    app.get("/room/:id",async(req,res)=>{
+  });
+  //single room data based on Id
+  app.get("/room/:id",async(req,res)=>{
       const id=req.params.id;
       const query={_id:new ObjectId(id)}
       const result=await roomsCollection.findOne(query);
       res.send(result)
-    });
-    //email based data
-    app.get("/rooms/:email",verifyToken,verifyHost,async(req,res)=>{
+  });
+  //email based room data
+  app.get("/rooms/:email",verifyToken,verifyHost,async(req,res)=>{
       const email=req.params.email;
       const query={'host.email':email}
       const result=await roomsCollection.find(query).toArray();
       res.send(result)
-    });
-
-    app.post("/room",verifyToken,verifyHost,async(req,res)=>{
+  });
+    //post for new room
+  app.post("/room",verifyToken,verifyHost,async(req,res)=>{
       const data=req.body;
       const result=await roomsCollection.insertOne(data);
       res.send(result)
-    });
+  });
 
 
    
 
-    // Admin Statistics
-    app.get('/admin-stat', verifyToken, verifyAdmin, async (req, res) => {
+  // Admin Statistics  
+  app.get('/admin-stat', verifyToken, verifyAdmin, async (req, res) => {
       const bookingDetails = await bookingsCollection
         .find(
           {},
@@ -343,10 +348,10 @@ async function run() {
         totalPrice,
         chartData,
       })
-    })
+  })
 
-    // Host Statistics
-    app.get('/host-stat', verifyToken, verifyHost, async (req, res) => {
+  // Host Statistics
+  app.get('/host-stat', verifyToken, verifyHost, async (req, res) => {
       const { email } = req.user
       const bookingDetails = await bookingsCollection
         .find(
@@ -391,10 +396,10 @@ async function run() {
         chartData,
         hostSince: timestamp,
       })
-    })
+  })
 
-    // Guest Statistics
-    app.get('/guest-stat', verifyToken, async (req, res) => {
+  // Guest Statistics
+  app.get('/guest-stat', verifyToken, async (req, res) => {
       const { email } = req.user
       const bookingDetails = await bookingsCollection
         .find(
@@ -434,9 +439,9 @@ async function run() {
         chartData,
         guestSince: timestamp,
       })
-    })
+  })
 
-    // Send a ping to confirm a successful connection
+  // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })
     console.log(
       'Pinged your deployment. You successfully connected to MongoDB!'
@@ -449,9 +454,9 @@ async function run() {
 run().catch(console.dir)
 
 app.get('/', (req, res) => {
-  res.send('Hello from StayVista Server..')
+  res.send('Hello from Travel Book Server..')
 })
 
 app.listen(port, () => {
-  console.log(`StayVista is running on port ${port}`)
+  console.log(`Travel Book is running on port ${port}`)
 })

@@ -13,10 +13,34 @@ const MenuDropdown = () => {
       <div className="flex flex-row items-center gap-3">
         {/* Become A Host btn */}
         <div className="hidden md:block">
-          <button className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition">
-            Host your home
-          </button>
+          
+          <Link
+            to={"/"}
+            className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition"
+          >
+            Forum
+          </Link>
+          <Link
+            to={"/"}
+            className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition"
+          >
+            Hotel
+          </Link>
+          <Link
+            to={"/"}
+            className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition"
+          >
+            Travel Agency
+          </Link>
+          <Link
+            to={"/"}
+            className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition"
+          >
+            About Us
+          </Link>
         </div>
+
+        <div></div>
         {/* Dropdown btn */}
         <div
           onClick={() => setIsOpen(!isOpen)}
@@ -41,10 +65,34 @@ const MenuDropdown = () => {
           {user ? (
             <div className="flex flex-col cursor-pointer">
               <Link
-                to="/"
-                className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                to={"/"}
+                className="block md:hidden disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition"
               >
                 Home
+              </Link>
+              <Link
+                to={"/"}
+                className="block md:hidden disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition"
+              >
+                Forum
+              </Link>
+              <Link
+                to={"/"}
+                className="block md:hidden disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition"
+              >
+                Hotel
+              </Link>
+              <Link
+                to={"/"}
+                className="block md:hidden disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition"
+              >
+                Travel Agency
+              </Link>
+              <Link
+                to={"/"}
+                className="block md:hidden disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition"
+              >
+                About Us
               </Link>
 
               <Link

@@ -11,6 +11,7 @@ import useAuth from "../../../hooks/useAuth";
 import useRole from "../../../hooks/useRole";
 import AdminMenu from "./Menu/AdminMenu";
 import HostMenu from "./Menu/HostMenu";
+import logoImg from "../../../assets/images/travelBook_logo.png";
 
 const Sidebar = () => {
   const { logOut } = useAuth();
@@ -36,10 +37,10 @@ const Sidebar = () => {
             <Link to="/">
               <img
                 // className='hidden md:block'
-                src="https://i.ibb.co/4ZXzmq5/logo.png"
+                src={logoImg}
                 alt="logo"
-                width="100"
-                height="100"
+                width="180"
+                height="180"
               />
             </Link>
           </div>
@@ -61,14 +62,14 @@ const Sidebar = () => {
       >
         <div>
           <div>
-            <div className="w-full hidden md:flex px-4 py-2 shadow-lg rounded-lg justify-center items-center bg-rose-100 mx-auto">
+            <div className="w-full hidden md:flex px-4 py-2 shadow-lg rounded-lg justify-center items-center  mx-auto">
               <Link to="/">
                 <img
                   // className='hidden md:block'
-                  src="https://i.ibb.co/4ZXzmq5/logo.png"
+                  src={logoImg}
                   alt="logo"
-                  width="100"
-                  height="100"
+                  width="180"
+                  height="180"
                 />
               </Link>
             </div>
@@ -83,7 +84,6 @@ const Sidebar = () => {
 
             {/*  Menu Items */}
             <nav>
-              
               {role === "guest" && <GuestMenu />}
               {role === "host" ? (
                 toggle ? (
